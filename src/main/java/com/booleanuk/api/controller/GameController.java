@@ -5,6 +5,7 @@ import com.booleanuk.api.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,18 +22,21 @@ public class GameController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<Game>> getAll() {
         List<Game> games = this.gameRepository.findAll();
         return ResponseEntity.ok(games);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Game> create(@RequestBody Game body) {
         Game game = this.gameRepository.save(body);
         return new ResponseEntity<>(game, HttpStatus.CREATED);
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Game> update(@PathVariable int id, @RequestBody Game body) {
         Game game = this.gameRepository.findById(id).orElse(null);
         if (game == null) {
@@ -50,6 +54,7 @@ public class GameController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Game> delete(@PathVariable int id) {
         Game game = this.gameRepository.findById(id).orElse(null);
         if (game == null) {
